@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output and caches
+.next/
+.turbo/
+.expo/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
+# Native and operating-system artifacts
+DerivedData/
+.DS_Store

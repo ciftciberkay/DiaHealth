@@ -1,0 +1,35 @@
+{
+  "name": "diahealth",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.8.1",
+  "scripts": {
+    "build": "turbo run build",
+    "db:migrate": "pnpm --filter @diahealth/api exec prisma migrate deploy",
+    "db:push": "pnpm --filter @diahealth/api exec prisma db push",
+    "db:studio": "pnpm --filter @diahealth/api exec prisma studio",
+    "dev": "turbo run dev --parallel",
+    "dev:admin": "pnpm --filter @diahealth/admin dev",
+    "dev:api": "pnpm --filter @diahealth/api dev",
+    "dev:mobile": "pnpm --filter @diahealth/mobile dev",
+    "lint": "turbo run lint",
+    "mobile:doctor": "pnpm --filter @diahealth/mobile exec npx expo-doctor",
+    "postinstall": "pnpm --filter @diahealth/api exec prisma generate",
+    "smoke:api": "curl -s -X POST http://127.0.0.1:3001/auth/session -H 'x-dev-auth: true' && echo && curl -s http://127.0.0.1:3001/profile/me -H 'x-dev-auth: true'",
+    "setup:local": "pnpm install && brew services start postgresql@17 && pnpm db:migrate",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@types/node": "^22.14.1",
+    "eslint": "^9.25.0",
+    "eslint-config-next": "^15.2.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.0.0",
+    "turbo": "^2.5.2",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1"
+  }
+}

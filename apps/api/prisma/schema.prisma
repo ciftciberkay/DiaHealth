@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DiabetesProfileType {
+  type1
+  type2
+  gestational
+}
+
+enum GenderType {
+  male
+  female
+}
+
+enum GlucoseReadingType {
+  fasting
+  postprandial
+  night
+  morning_fasting
+  morning_postprandial
+  noon_fasting
+  noon_postprandial
+  evening_fasting
+  evening_postprandial
+}
+
+enum HealthMetricType {
+  hba1c
+  blood_pressure
+  weight
+}
+
+enum MedicationStatus {
+  scheduled
+  taken
+  skipped
+}
+
+enum MealType {
+  breakfast
+  lunch
+  dinner
+  snack
+}
+
+enum ActivityType {
+  steps
+  exercise
+}
+
+model User {
+  id          String         @id @default(uuid())
+  firebaseUid String         @unique
+  email       String?
+  displayName String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  profile     UserProfile?
+  devAuth     DevAuthCredential?
+  glucoseLogs GlucoseLog[]
+  metrics     HealthMetric[]
+  hydration   HydrationLog[]
+  medications MedicationLog[]
+  medicationPlans MedicationPlan[]
+  meals       MealLog[]
+  activities  ActivityLog[]
+  reminderPreference ReminderPreference?
+}
+
+model DevAuthCredential {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  userId       String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserProfile {
+  id                   String              @id @default(uuid())
+  userId               String              @unique
+  language             String              @default("en")
+  gender               GenderType?
+  diabetesProfile      DiabetesProfileType @default(type2)
+  fullName             String              @default("")
+  heightCm             Float?
+  weightKg             Float?
+  onboardingCompleted  Boolean             @default(false)
+  disclaimerAcceptedAt DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GlucoseLog {
+  id          String             @id @default(uuid())
+  userId      String
+  readingType GlucoseReadingType
+  valueMgDl   Float
+  measuredAt  DateTime
+  note        String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  deletedAt   DateTime?
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt(sort: Desc)])
+}
+
+model HealthMetric {
+  id         String           @id @default(uuid())
+  userId     String
+  metricType HealthMetricType
+  value      String
+  measuredAt DateTime
+  note       String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  deletedAt  DateTime?
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt(sort: Desc)])
+}
+
+model HydrationLog {
+  id         String   @id @default(uuid())
+  userId     String
+  amountMl   Int
+  measuredAt DateTime
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt(sort: Desc)])
+}
+
+model MedicationLog {
+  id             String           @id @default(uuid())
+  userId         String
+  medicationName String
+  dosage         String
+  scheduledFor   DateTime
+  status         MedicationStatus
+  takenAt        DateTime?
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scheduledFor(sort: Desc)])
+}
+
+model MedicationPlan {
+  id             String   @id @default(uuid())
+  userId         String
+  medicationName String
+  dosage         String
+  scheduleTime   String
+  isActive       Boolean  @default(true)
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+}
+
+model MealLog {
+  id                String   @id @default(uuid())
+  userId            String
+  mealType          MealType
+  mealName          String
+  carbohydrateGrams Float
+  calories          Int
+  measuredAt        DateTime
+  note              String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt(sort: Desc)])
+}
+
+model ActivityLog {
+  id              String       @id @default(uuid())
+  userId          String
+  activityType    ActivityType
+  steps           Int?
+  durationMinutes Int?
+  measuredAt      DateTime
+  note            String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt(sort: Desc)])
+}
+
+model ReminderPreference {
+  id                      String   @id @default(uuid())
+  userId                  String   @unique
+  measurementReminders    Boolean  @default(false)
+  medicationReminders     Boolean  @default(false)
+  hydrationReminders      Boolean  @default(false)
+  activityReminders       Boolean  @default(false)
+  measurementReminderTime String   @default("08:00")
+  hydrationReminderTime   String   @default("11:00")
+  activityReminderTime    String   @default("18:00")
+  healthPermissionApproved Boolean @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "diahealth",
+    "slug": "diahealth",
+    "scheme": "diahealth",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "plugins": [
+      "expo-apple-authentication",
+      "expo-localization",
+      "expo-notifications",
+      "expo-sqlite",
+      "@react-native-community/datetimepicker",
+      "expo-image"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.diahealth.mobile",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.diahealth.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "extra": {
+      "apiUrl": "http://10.22.199.144:3001"
+    }
+  }
+}
